@@ -222,6 +222,22 @@ export default function OfficerDashboard({ currentUser, requests, activeSection,
   const activeRequests = myRequests.filter(r => r.status === 'new' || r.status === 'in_progress');
   const closedRequests = myRequests.filter(r => r.status === 'done' || r.status === 'rejected');
 
+  if (showForm) {
+    return (
+      <div className="space-y-4 animate-fade-in">
+        <div className="flex items-center gap-3 mb-2">
+          <button onClick={() => setShowForm(false)} className="p-1.5 rounded transition-all" style={{ color: 'hsl(220 15% 55%)' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'hsl(220 15% 92%)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+            <Icon name="ArrowLeft" size={16} />
+          </button>
+          <h1 className="text-xl font-bold" style={{ color: 'hsl(220 30% 15%)' }}>Новый запрос</h1>
+        </div>
+        <NewRequestForm currentUser={currentUser} onSubmit={data => { onCreateRequest(data); setShowForm(false); }} onCancel={() => setShowForm(false)} />
+      </div>
+    );
+  }
+
   if (activeSection === 'dashboard') {
     return (
       <div className="space-y-6 animate-fade-in">
@@ -377,23 +393,6 @@ export default function OfficerDashboard({ currentUser, requests, activeSection,
             </div>
           ))}
         </div>
-      </div>
-    );
-  }
-
-  // Overlay form for dashboard
-  if (showForm) {
-    return (
-      <div className="space-y-4 animate-fade-in">
-        <div className="flex items-center gap-3 mb-2">
-          <button onClick={() => setShowForm(false)} className="p-1.5 rounded transition-all" style={{ color: 'hsl(220 15% 55%)' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'hsl(220 15% 92%)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-            <Icon name="ArrowLeft" size={16} />
-          </button>
-          <h1 className="text-xl font-bold" style={{ color: 'hsl(220 30% 15%)' }}>Новый запрос</h1>
-        </div>
-        <NewRequestForm currentUser={currentUser} onSubmit={data => { onCreateRequest(data); setShowForm(false); }} onCancel={() => setShowForm(false)} />
       </div>
     );
   }
