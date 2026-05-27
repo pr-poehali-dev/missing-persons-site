@@ -224,14 +224,35 @@ export function useAppStore() {
   const [requests, setRequests] = useState<MissingRequest[]>(DEMO_REQUESTS);
   const [logs, setLogs] = useState<LogEntry[]>(DEMO_LOGS);
 
-  const login = useCallback((login: string, password: string): { success: boolean; error?: string } => {
-    const user = users.find(u => u.login === login && u.password === password);
-    if (!user) return { success: false, error: 'Неверный логин или пароль' };
-    if (!user.isActive) return { success: false, error: 'Учётная запись заблокирована' };
-    setCurrentUser(user);
-    addLog(user, 'Вход в систему', `Пользователь вошёл в систему`);
-    return { success: true };
-  }, [users]);
+  const login = useCallback(async (login: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch('https://functions.poehali.dev/0bcc0844-acc4-4973-953c-464f547e49a9', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login, password }),
+      });
+      const raw = await res.json();
+      const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!data.success) return { success: false, error: data.error || 'Неверный логин или пароль' };
+      const u = data.user;
+      const user: User = {
+        id: u.id,
+        fullName: u.fullName,
+        login: u.login,
+        password: '',
+        role: u.role as Role,
+        department: u.department,
+        rank: u.rank ?? undefined,
+        isActive: u.isActive,
+        createdAt: u.createdAt ?? new Date().toISOString(),
+      };
+      setCurrentUser(user);
+      addLog(user, 'Вход в систему', 'Пользователь вошёл в систему');
+      return { success: true };
+    } catch {
+      return { success: false, error: 'Ошибка соединения с сервером' };
+    }
+  }, []);
 
   const logout = useCallback(() => {
     if (currentUser) {

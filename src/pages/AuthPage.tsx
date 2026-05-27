@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 
 interface AuthPageProps {
-  onLogin: (login: string, password: string) => { success: boolean; error?: string };
+  onLogin: (login: string, password: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export default function AuthPage({ onLogin }: AuthPageProps) {
@@ -20,8 +20,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
     }
     setLoading(true);
     setError('');
-    await new Promise(r => setTimeout(r, 400));
-    const result = onLogin(login, password);
+    const result = await onLogin(login, password);
     if (!result.success) {
       setError(result.error || 'Ошибка авторизации');
     }

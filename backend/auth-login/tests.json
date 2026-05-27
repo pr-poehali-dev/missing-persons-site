@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "Login with wrong credentials",
+      "method": "POST",
+      "path": "/",
+      "body": {"login": "nobody", "password": "wrong"},
+      "expectedStatus": 401,
+      "expectedBody": {"success": false},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Login admin success",
+      "method": "POST",
+      "path": "/",
+      "body": {"login": "o.tyutyakin@sarmat-team.ru", "password": "Samp03@Samp"},
+      "expectedStatus": 200,
+      "expectedBody": {"success": true},
+      "bodyMatcher": "partial"
+    }
+  ]
+}
