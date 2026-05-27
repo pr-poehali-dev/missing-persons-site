@@ -9,9 +9,9 @@ interface AdminDashboardProps {
   logs: LogEntry[];
   activeSection: string;
   onSectionChange: (s: string) => void;
-  onToggleUser: (id: string) => void;
-  onDeleteUser: (id: string) => void;
-  onAddUser: (data: Omit<User, 'id' | 'createdAt'>) => void;
+  onToggleUser: (id: string) => Promise<void>;
+  onDeleteUser: (id: string) => Promise<void>;
+  onAddUser: (data: Omit<User, 'id' | 'createdAt'>) => Promise<{ success: boolean; error?: string; user?: User }>;
   onViewRequest: (req: MissingRequest) => void;
 }
 
@@ -41,6 +41,8 @@ export default function AdminDashboard({
 }: AdminDashboardProps) {
   const [showAddUser, setShowAddUser] = useState(false);
   const [newUser, setNewUser] = useState({ fullName: '', login: '', password: '', role: 'officer' as User['role'], department: '', rank: '' });
+  const [addUserError, setAddUserError] = useState('');
+  const [addUserLoading, setAddUserLoading] = useState(false);
 
   const stats = {
     total: requests.length,
@@ -50,9 +52,19 @@ export default function AdminDashboard({
     rejected: requests.filter(r => r.status === 'rejected').length,
   };
 
-  const handleAddUser = () => {
-    if (!newUser.fullName || !newUser.login || !newUser.password || !newUser.department) return;
-    onAddUser({ ...newUser, isActive: true });
+  const handleAddUser = async () => {
+    if (!newUser.fullName || !newUser.login || !newUser.password || !newUser.department) {
+      setAddUserError('Заполните все обязательные поля');
+      return;
+    }
+    setAddUserLoading(true);
+    setAddUserError('');
+    const result = await onAddUser({ ...newUser, isActive: true });
+    setAddUserLoading(false);
+    if (!result.success) {
+      setAddUserError(result.error || 'Ошибка при создании пользователя');
+      return;
+    }
     setNewUser({ fullName: '', login: '', password: '', role: 'officer', department: '', rank: '' });
     setShowAddUser(false);
   };
@@ -204,13 +216,18 @@ export default function AdminDashboard({
                 </select>
               </div>
             </div>
+            {addUserError && (
+              <div className="mb-3 px-3 py-2 rounded text-sm" style={{ background: 'hsl(0 72% 51% / 0.1)', color: 'hsl(0 72% 45%)', border: '1px solid hsl(0 72% 51% / 0.3)' }}>
+                {addUserError}
+              </div>
+            )}
             <div className="flex gap-2">
-              <button onClick={handleAddUser}
+              <button onClick={handleAddUser} disabled={addUserLoading}
                 className="px-4 py-2 rounded text-sm font-medium text-white"
-                style={{ background: 'hsl(210 80% 48%)' }}>
-                Создать
+                style={{ background: addUserLoading ? 'hsl(210 80% 65%)' : 'hsl(210 80% 48%)', cursor: addUserLoading ? 'not-allowed' : 'pointer' }}>
+                {addUserLoading ? 'Сохранение...' : 'Создать'}
               </button>
-              <button onClick={() => setShowAddUser(false)}
+              <button onClick={() => { setShowAddUser(false); setAddUserError(''); }}
                 className="px-4 py-2 rounded text-sm font-medium"
                 style={{ background: 'hsl(220 15% 92%)', color: 'hsl(220 30% 30%)' }}>
                 Отмена

@@ -320,29 +320,65 @@ export function useAppStore() {
     addLog(currentUser, 'Обновление статуса заявки', `Заявка #${requestId}: статус изменён на "${status}"`);
   }, [currentUser, addLog]);
 
-  const addUser = useCallback((userData: Omit<User, 'id' | 'createdAt'>) => {
-    const user: User = {
-      ...userData,
-      id: `u${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    };
-    setUsers(prev => [...prev, user]);
-    if (currentUser) {
-      addLog(currentUser, 'Создание пользователя', `Создан пользователь: ${user.fullName}`);
+  const USERS_URL = 'https://functions.poehali.dev/5d82512a-c23b-41dd-b7ae-380c61c68d03';
+
+  const addUser = useCallback(async (userData: Omit<User, 'id' | 'createdAt'>): Promise<{ success: boolean; error?: string; user?: User }> => {
+    try {
+      const res = await fetch(USERS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+      const raw = await res.json();
+      const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!data.success) return { success: false, error: data.error };
+      const u = data.user;
+      const user: User = {
+        id: u.id,
+        fullName: u.fullName,
+        login: u.login,
+        password: '',
+        role: u.role as Role,
+        department: u.department,
+        rank: u.rank ?? undefined,
+        isActive: u.isActive,
+        createdAt: u.createdAt,
+      };
+      setUsers(prev => [...prev, user]);
+      if (currentUser) {
+        addLog(currentUser, 'Создание пользователя', `Создан пользователь: ${user.fullName}`);
+      }
+      return { success: true, user };
+    } catch {
+      return { success: false, error: 'Ошибка соединения с сервером' };
     }
-    return user;
   }, [currentUser, addLog]);
 
-  const toggleUserActive = useCallback((userId: string) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, isActive: !u.isActive } : u));
-    if (currentUser) {
-      const target = users.find(u => u.id === userId);
-      addLog(currentUser, 'Изменение статуса пользователя', `Пользователь ${target?.fullName}: статус изменён`);
+  const toggleUserActive = useCallback(async (userId: string) => {
+    try {
+      const res = await fetch(`${USERS_URL}/${userId}/toggle`, { method: 'PUT' });
+      const raw = await res.json();
+      const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (data.success) {
+        setUsers(prev => prev.map(u => u.id === userId ? { ...u, isActive: data.isActive } : u));
+        if (currentUser) {
+          const target = users.find(u => u.id === userId);
+          addLog(currentUser, 'Изменение статуса пользователя', `Пользователь ${target?.fullName}: статус изменён`);
+        }
+      }
+    } catch {
+      // fallback — обновляем локально
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, isActive: !u.isActive } : u));
     }
   }, [currentUser, users, addLog]);
 
-  const deleteUser = useCallback((userId: string) => {
+  const deleteUser = useCallback(async (userId: string) => {
     const target = users.find(u => u.id === userId);
+    try {
+      await fetch(`${USERS_URL}/${userId}`, { method: 'DELETE' });
+    } catch {
+      // ignore
+    }
     setUsers(prev => prev.filter(u => u.id !== userId));
     if (currentUser && target) {
       addLog(currentUser, 'Удаление пользователя', `Удалён пользователь: ${target.fullName}`);

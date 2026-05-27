@@ -1,0 +1,13 @@
+{
+  "tests": [
+    {
+      "name": "Create user missing fields",
+      "method": "POST",
+      "path": "/",
+      "body": {"fullName": "", "login": "", "password": "", "department": ""},
+      "expectedStatus": 400,
+      "expectedBody": {"success": false},
+      "bodyMatcher": "partial"
+    }
+  ]
+}
