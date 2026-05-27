@@ -180,7 +180,7 @@ function NewRequestForm({ currentUser, onSubmit, onCancel }: {
           <div className="grid grid-cols-3 gap-3">
             {[
               { key: 'militaryUnit', label: 'Воинская часть', placeholder: 'В/ч 00000' },
-              { key: 'militaryRank', label: 'Воинское звание', placeholder: 'Рядовой' },
+              { key: 'militaryRank', label: 'Номер жетона', placeholder: 'Если известно' },
               { key: 'serviceType', label: 'Вид службы', placeholder: 'Срочная служба' },
             ].map(f => (
               <div key={f.key}>
