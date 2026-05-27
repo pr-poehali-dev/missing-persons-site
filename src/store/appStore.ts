@@ -151,6 +151,28 @@ const DEMO_REQUESTS: MissingRequest[] = [
     circumstances: 'Пенсионерка ушла в магазин и не вернулась, дезориентация не исключена',
     comments: [],
   },
+  {
+    id: 'r4',
+    type: 'military',
+    status: 'new',
+    createdAt: '2025-05-27T08:10:00Z',
+    updatedAt: '2025-05-27T08:10:00Z',
+    authorId: 'u3',
+    authorName: 'Петров Дмитрий Сергеевич',
+    authorDepartment: 'МВД России по Орловской области',
+    lastName: 'Громов',
+    firstName: 'Василий',
+    middleName: 'Павлович',
+    birthDate: '2001-04-09',
+    gender: 'male',
+    lastKnownAddress: 'г. Орёл, ул. Победы, 32, кв. 5',
+    disappearanceDate: '2025-05-01',
+    circumstances: 'Проходит военную службу, выход на связь прекратился более месяца назад, родственники обеспокоены',
+    militaryUnit: 'В/ч 73612',
+    militaryRank: 'Рядовой',
+    serviceType: 'Контрактная служба',
+    comments: [],
+  },
 ];
 
 const DEMO_LOGS: LogEntry[] = [
@@ -185,6 +207,14 @@ const DEMO_LOGS: LogEntry[] = [
     action: 'Создание заявки',
     details: 'Создана заявка #r3 (медицинское учреждение, Морозова Е.С.)',
     createdAt: '2025-05-26T16:45:00Z',
+  },
+  {
+    id: 'l5',
+    userId: 'u3',
+    userName: 'Петров Дмитрий Сергеевич',
+    action: 'Создание заявки',
+    details: 'Создана заявка #r4 (военнослужащий, Громов В.П.)',
+    createdAt: '2025-05-27T08:10:00Z',
   },
 ];
 
