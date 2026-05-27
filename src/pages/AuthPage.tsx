@@ -51,7 +51,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
           </div>
 
           <h1 className="text-2xl font-bold text-white leading-tight mb-3">
-            Система регистрации<br />несчастных случаев
+            ИС "БРНС" ОРОО<br />"ПСО "САРМАТ"
           </h1>
           <p className="text-sm leading-relaxed" style={{ color: 'hsl(210 40% 65%)' }}>
             Автоматизированная система обработки запросов о розыске пропавших людей и установлении статуса военнослужащих
@@ -62,8 +62,6 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
           {[
             { icon: 'Search', text: 'Поиск в медицинских учреждениях' },
             { icon: 'Star', text: 'Статус военнослужащих' },
-            { icon: 'Users', text: 'Ролевая система доступа' },
-            { icon: 'FileText', text: 'Журнал всех операций' },
           ].map((item) => (
             <div key={item.text} className="flex items-center gap-3">
               <div className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0"
@@ -77,7 +75,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
 
         <div className="relative z-10">
           <p className="text-xs" style={{ color: 'hsl(210 40% 45%)' }}>
-            © 2025 Служба БРНС Орловской области.<br />Доступ разрешён только уполномоченным лицам.
+            © 2026 ИС "БРНС" ОРОО "ПСО "САРМАТ".<br />Доступ разрешён только уполномоченным лицам.
           </p>
         </div>
       </div>
